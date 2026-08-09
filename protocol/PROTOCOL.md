@@ -50,19 +50,35 @@ compares; mismatch → reply `ERR CK`.
 
 ## Commands, Pi → rocket
 
-| Word     | Args             | Meaning                                                        |
-|----------|------------------|------------------------------------------------------------------|
-| `PING`   | —                | Liveness / troubleshooting check.                                |
-| `ANIM`   | `<n>`            | Play animation index `n` on both matrices; loops until next command. |
-| `IGNITE` | `<duration_ms>`  | Fire the ignition ring for `duration_ms`, then auto-off.         |
-| `OFF`    | —                | Blank both matrices and the ring; return to idle.                |
+| Word   | Args     | Meaning                                                                 |
+|--------|----------|--------------------------------------------------------------------------|
+| `PING` | —        | Liveness / troubleshooting check.                                        |
+| `SHOW` | `<name>` | Run the named show-state. Both matrices and the ignition ring update together as that state defines, entirely rocket-side. |
 
 ## Replies, rocket → Pi
 
 | Word  | Args             | Meaning                                                         |
 |-------|------------------|-------------------------------------------------------------------|
-| `ACK` | `<echoed word>`  | Command received and applied, e.g. `PI ACK ANIM *xx`.             |
+| `ACK` | `<echoed word>`  | Command received and applied, e.g. `PI ACK SHOW *xx`.             |
 | `ERR` | `<code>`         | Command received but rejected. Codes: `CK` (bad checksum), `ARG` (bad/missing argument), `UNK` (unknown word). |
+
+## Show catalog
+
+`SHOW` names are a shared vocabulary between `conductor/`'s choreography
+data and `rocket/`'s firmware — a name referenced by a choreography file
+that isn't implemented on the rocket is exactly the protocol-drift failure
+mode this document exists to prevent. New names get added here before use.
+
+Two names are protocol-reserved because the conductor's control logic
+depends on every rocket implementing them:
+
+| Name   | Meaning                                                              |
+|--------|------------------------------------------------------------------------|
+| `OFF`  | Immediate blank — both matrices and the ring dark, no animation.       |
+| `HALT` | Graceful faltering shutdown — wobbling brightness, dying ignition glow, ends dark. |
+
+No other show names are defined yet; those arrive with the choreography
+files that use them.
 
 ## Timeout / retry (conductor side)
 
