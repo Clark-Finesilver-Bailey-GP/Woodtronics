@@ -80,6 +80,12 @@ depends on every rocket implementing them:
 No other show names are defined yet; those arrive with the choreography
 files that use them.
 
+| Name       | Meaning                                                          |
+|------------|---------------------------------------------------------------------|
+| `IDLE`     | Quiescent bookend state — used at the start/end of every show.      |
+| `LAUNCH_A` | Example show variant (`shows/launch_a.json`). Placeholder content.  |
+| `LAUNCH_B` | Example show variant (`shows/launch_b.json`). Placeholder content.  |
+
 ## Timeout / retry (conductor side)
 
 - 200ms read timeout waiting for a reply to any sent command.

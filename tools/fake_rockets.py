@@ -11,8 +11,8 @@ import argparse
 import os
 import sys
 
-VALID_WORDS = {"PING", "ANIM", "IGNITE", "OFF"}
-EXPECTED_ARGC = {"PING": 0, "ANIM": 1, "IGNITE": 1, "OFF": 0}
+VALID_WORDS = {"PING", "SHOW"}
+EXPECTED_ARGC = {"PING": 0, "SHOW": 1}
 
 
 def checksum(data: bytes) -> str:
@@ -38,11 +38,6 @@ def handle_command(addr: str, word: str, args: list[str]) -> str:
         return f"PI ERR UNK"
     if len(args) != EXPECTED_ARGC[word]:
         return f"PI ERR ARG"
-    if word in ("ANIM", "IGNITE"):
-        try:
-            int(args[0])
-        except ValueError:
-            return f"PI ERR ARG"
     return f"PI ACK {word}"
 
 
