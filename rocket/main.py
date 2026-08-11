@@ -9,22 +9,20 @@ import neopixel
 
 import link
 import shows
-
-# Change this per physical unit before flashing.
-ROCKET_ID = "R1"
+from config import ROCKET_ID
 
 UART_ID = 0
 UART_TX_PIN = 0
 UART_RX_PIN = 1
 BAUD = 115200  # must match protocol/PROTOCOL.md
 
-MATRIX_A_PIN = 2
-MATRIX_B_PIN = 3
-RING_PIN = 4
+MATRIX_A_PIN = 10
+MATRIX_B_PIN = 11
+RING_PIN = 12
 MATRIX_PIXELS = 64  # 8x8
 RING_PIXELS = 16
 
-TICK_MS = 20
+TICK_MS = 33  # ~30fps frame clock, per protocol/spec — the rate show math is tuned against
 MAX_BUF_BYTES = 128  # matches PROTOCOL.md's 64-byte max line, with headroom
 
 

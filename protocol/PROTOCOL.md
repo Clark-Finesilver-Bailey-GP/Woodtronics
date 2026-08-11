@@ -83,8 +83,7 @@ files that use them.
 | Name       | Meaning                                                          |
 |------------|---------------------------------------------------------------------|
 | `IDLE`     | Quiescent bookend state — used at the start/end of every show.      |
-| `LAUNCH_A` | Example show variant (`shows/launch_a.json`). Placeholder content.  |
-| `LAUNCH_B` | Example show variant (`shows/launch_b.json`). Placeholder content.  |
+| `LAUNCH`   | Full WAKE→CHARGE→IGNITION→CLIMB→RELAY→SETTLE sequence, ~14s. Entirely rocket-side, timed off elapsed ms since the `SHOW LAUNCH` command. `shows/launch_a.json` and `shows/launch_b.json` are two example stagger orders across the array, both using this same show. |
 
 ## Timeout / retry (conductor side)
 
