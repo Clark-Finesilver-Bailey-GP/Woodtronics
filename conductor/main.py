@@ -1,11 +1,12 @@
 """Conductor entry point: button -> show -> rockets, per protocol/PROTOCOL.md."""
+import argparse
 import logging
 import time
 from pathlib import Path
 
 import serial
-from gpiozero import Button
 
+from fake_button import FakeButton
 from link import RocketLink
 from schedule import Scheduler, make_halt_steps, pick_random_show
 
@@ -25,7 +26,7 @@ class ButtonState:
     pressed = False
 
 
-def run(link: RocketLink, button: Button, shows_dir: Path) -> None:
+def run(link: RocketLink, button: object, shows_dir: Path) -> None:
     state = ButtonState()
     button.when_pressed = lambda: setattr(state, "pressed", True)
 
@@ -50,9 +51,21 @@ def run(link: RocketLink, button: Button, shows_dir: Path) -> None:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--fake-button", action="store_true",
+                         help="use spacebar instead of the real arcade button (no hardware yet)")
+    args = parser.parse_args()
+
     conn = serial.Serial(SERIAL_PORT, BAUD)
     link = RocketLink(conn)
-    button = Button(BUTTON_PIN, bounce_time=0.05)
+
+    if args.fake_button:
+        button = FakeButton()
+        logger.info("fake button active: press SPACE to trigger")
+    else:
+        from gpiozero import Button
+        button = Button(BUTTON_PIN, bounce_time=0.05)
+
     run(link, button, SHOWS_DIR)
 
 
