@@ -57,9 +57,11 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--fake-button", action="store_true",
                          help="use spacebar instead of the real arcade button (no hardware yet)")
+    parser.add_argument("--port", default=SERIAL_PORT,
+                         help="serial device, e.g. a tools/fake_rockets.py pty for bench testing")
     args = parser.parse_args()
 
-    conn = serial.Serial(SERIAL_PORT, BAUD)
+    conn = serial.Serial(args.port, BAUD)
     link = RocketLink(conn)
 
     if args.fake_button:
