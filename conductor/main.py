@@ -11,7 +11,10 @@ from link import RocketLink
 from schedule import Scheduler, make_halt_steps, pick_random_show
 
 ROCKET_ADDRS = ["R1", "R2", "R3", "R4", "R5"]
-SERIAL_PORT = "/dev/serial0"
+# On Pi 5, /dev/serial0 is the debug-header UART, not GPIO14/15. The bus
+# uses GPIO14/15, which needs dtoverlay=uart0-pi5 in config.txt and shows
+# up as /dev/ttyAMA0. See protocol/PROTOCOL.md "Pi 5 UART setup".
+SERIAL_PORT = "/dev/ttyAMA0"
 BAUD = 115200
 BUTTON_PIN = 17
 SHOWS_DIR = Path(__file__).parent.parent / "shows"

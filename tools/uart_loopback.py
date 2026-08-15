@@ -6,8 +6,12 @@ rocket is involved. Jumper a wire from the UART TX pin to the RX pin (e.g.
 GPIO14 to GPIO15 on the 40-pin header) and run this with nothing else
 attached to the bus.
 
+On a Pi 5, the bus UART is /dev/ttyAMA0 (requires dtoverlay=uart0-pi5 in
+config.txt) — /dev/serial0 is the separate debug-header UART and won't see
+anything on GPIO14/15. See protocol/PROTOCOL.md "Pi 5 UART setup".
+
 Usage:
-    python tools/uart_loopback.py [--port /dev/serial0] [--baud 115200]
+    python tools/uart_loopback.py [--port /dev/ttyAMA0] [--baud 115200]
 """
 import argparse
 import sys
@@ -20,7 +24,7 @@ TEST_PAYLOAD = bytes(range(256)) * 4  # 1024 bytes, exercises every byte value
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--port", default="/dev/serial0")
+    parser.add_argument("--port", default="/dev/ttyAMA0")
     parser.add_argument("--baud", type=int, default=115200)
     args = parser.parse_args()
 

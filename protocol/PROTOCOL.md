@@ -4,6 +4,19 @@ Single source of truth for the conductor (Pi) and every rocket (RP2040).
 If you change anything here, update both `conductor/` and `rocket/` to match.
 Protocol drift between the two sides is the failure mode we care about most.
 
+## Pi 5 UART setup
+
+`/dev/serial0` on a Pi 5 is the 3-pin debug-header UART, **not** GPIO14/15 —
+writes to it never reach the 40-pin header no matter how correct the pin
+mux looks. The bus uses GPIO14/15, which requires:
+
+```
+dtoverlay=uart0-pi5
+```
+
+in `/boot/firmware/config.txt`. After reboot it shows up as `/dev/ttyAMA0`
+(not `/dev/serial0`) — use that device path on the conductor side.
+
 ## Bus
 
 - Single shared UART, 115200 baud, 8N1.
