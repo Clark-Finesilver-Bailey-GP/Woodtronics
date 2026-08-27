@@ -28,7 +28,7 @@ class ButtonState:
     pressed = False
 
 
-def run(link: RocketLink, button: object, shows_dir: Path) -> None:
+def run(link: RocketLink, button: object, shows_dir: Path, roster: list[str]) -> None:
     state = ButtonState()
     button.when_pressed = lambda: setattr(state, "pressed", True)
 
@@ -37,12 +37,15 @@ def run(link: RocketLink, button: object, shows_dir: Path) -> None:
         if state.pressed:
             state.pressed = False
             if scheduler is None:
-                steps = pick_random_show(shows_dir)
-                logger.info("show triggered: %d steps", len(steps))
+                # Only address rockets that exist. Steps for absent rockets
+                # would each cost a blocking read timeout + retry, dragging the
+                # staggered timing the whole show depends on.
+                steps = [s for s in pick_random_show(shows_dir) if s.rocket in roster]
+                logger.info("show triggered: %d steps for %s", len(steps), ",".join(roster))
                 scheduler = Scheduler(steps)
             else:
                 logger.info("halt triggered mid-show")
-                scheduler = Scheduler(make_halt_steps(ROCKET_ADDRS, HALT_JITTER_MAX_MS))
+                scheduler = Scheduler(make_halt_steps(roster, HALT_JITTER_MAX_MS))
 
         if scheduler is not None:
             scheduler.tick(link)
@@ -61,7 +64,12 @@ def main() -> None:
                               "the console. Handy for bench testing, not for the exhibit.")
     parser.add_argument("--port", default=SERIAL_PORT,
                          help="serial device, e.g. a tools/fake_rockets.py pty for bench testing")
+    parser.add_argument("--rockets", default=",".join(ROCKET_ADDRS),
+                         help="comma-separated rockets actually on the bus, e.g. R3,R4. "
+                              "Absent rockets are skipped so their timeouts don't skew timing.")
     args = parser.parse_args()
+
+    roster = [r.strip() for r in args.rockets.split(",") if r.strip()]
 
     conn = serial.Serial(args.port, BAUD)
     link = RocketLink(conn)
@@ -74,7 +82,7 @@ def main() -> None:
         button = UsbButton(grab=not args.no_grab)
         logger.info("USB arcade button active%s", "" if not args.no_grab else " (not grabbed)")
 
-    run(link, button, SHOWS_DIR)
+    run(link, button, SHOWS_DIR, roster)
 
 
 if __name__ == "__main__":
