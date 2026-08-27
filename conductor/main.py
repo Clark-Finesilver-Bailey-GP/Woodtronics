@@ -16,7 +16,6 @@ ROCKET_ADDRS = ["R1", "R2", "R3", "R4", "R5"]
 # up as /dev/ttyAMA0. See protocol/PROTOCOL.md "Pi 5 UART setup".
 SERIAL_PORT = "/dev/ttyAMA0"
 BAUD = 115200
-BUTTON_PIN = 17
 SHOWS_DIR = Path(__file__).parent.parent / "shows"
 HALT_JITTER_MAX_MS = 800
 TICK_S = 0.02
@@ -56,7 +55,10 @@ def run(link: RocketLink, button: object, shows_dir: Path) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--fake-button", action="store_true",
-                         help="use spacebar instead of the real arcade button (no hardware yet)")
+                         help="use spacebar (stdin) instead of the real USB arcade button")
+    parser.add_argument("--no-grab", action="store_true",
+                         help="do not EVIOCGRAB the button; its Enter presses also reach "
+                              "the console. Handy for bench testing, not for the exhibit.")
     parser.add_argument("--port", default=SERIAL_PORT,
                          help="serial device, e.g. a tools/fake_rockets.py pty for bench testing")
     args = parser.parse_args()
@@ -68,8 +70,9 @@ def main() -> None:
         button = FakeButton()
         logger.info("fake button active: press SPACE to trigger")
     else:
-        from gpiozero import Button
-        button = Button(BUTTON_PIN, bounce_time=0.05)
+        from usb_button import UsbButton
+        button = UsbButton(grab=not args.no_grab)
+        logger.info("USB arcade button active%s", "" if not args.no_grab else " (not grabbed)")
 
     run(link, button, SHOWS_DIR)
 
